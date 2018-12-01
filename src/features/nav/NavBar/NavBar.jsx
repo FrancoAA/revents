@@ -32,6 +32,7 @@ class NavBar extends Component {
             Revents
           </Menu.Item>
           {authenticated  &&  <Menu.Item as={NavLink} to="/events" name="Events"></Menu.Item>}
+          {authenticated  &&  <Menu.Item as={NavLink} to="/test" name="Test"></Menu.Item>}
           {authenticated  && <Menu.Item as={NavLink} to="/people" name="People"></Menu.Item>}
           <Menu.Item>
             <Button as={Link} to="/createEvent" floated="right" positive inverted content="Create Event"></Button>
