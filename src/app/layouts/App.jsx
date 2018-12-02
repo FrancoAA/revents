@@ -27,7 +27,8 @@ class App extends Component {
             <Container className="main">
             <Switch>
               <Route path="/events" component={EventDashboard}/>
-              <Route path="/events/:id" component={EventDetailedPage}/>
+              <Route path="/event/:id" component={EventDetailedPage}/>
+              <Route path="/manage/:id" component={EventForm}/>
               <Route path="/people" component={PeopleDashboard}/>
               <Route path="/profile/:id" component={UserDetailed}/>
               <Route path="/settings" component={SettingsDashboard}/>

@@ -1,36 +1,42 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux';
+import cuid from 'cuid';
+
+import { createEvent, updateEvent } from '../eventActions';
 import { Segment, Form, Button } from 'semantic-ui-react';
 
 
-const emptyEvent = {
-  title : '',
-  date : '',
-  city : '',
-  venue : '',
-  hostedBy : '',
-  attendees : []
-};
+const actions = {
+  createEvent,
+  updateEvent
+}
 
-export default class EventForm extends Component {
+const mapState = (state, ownProps) => {
+  const eventId = ownProps.match.params.id;
+
+  let event = {
+    title : '',
+    date : '',
+    city : '',
+    venue : '',
+    hostedBy : '',
+    attendees : []
+  };
+
+  if (eventId && state.events.length > 0) {
+    event = state.events.filter(event => event.id === eventId)[0];
+  }
+
+  return {
+    event
+  };
+}
+
+
+class EventForm extends Component {
 
   state = {
-    event : emptyEvent
-  }
-
-  componentDidMount() {
-    if (this.props.selectedEvent) {
-      this.setState({
-        event : this.props.selectedEvent
-      });
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.selectedEvent !== this.props.selectedEvent) {
-      this.setState({
-        event : nextProps.selectedEvent || emptyEvent
-      });
-    }
+    event : Object.assign({}, this.props.event)
   }
 
   onInputChange = (evt) => {
@@ -45,15 +51,20 @@ export default class EventForm extends Component {
     evt.preventDefault();
     if (this.state.event.id) {
       this.props.updateEvent(this.state.event);
+      this.props.history.goBack();
     }
     else {
-      this.props.createEvent(this.state.event);
+      const newEvent = {
+        ...this.state.event,
+        id : cuid(),
+        hostPhotoURL : '/assets/user.png'
+      };
+      this.props.createEvent(newEvent);
+      this.props.history.push('/events');
     }
   }
 
   render() {
-    const { handleCancel } = this.props;
-
     return (
       <Segment>
         <Form onSubmit={this.onFormSubmit}>
@@ -75,14 +86,16 @@ export default class EventForm extends Component {
           </Form.Field>
           <Form.Field>
             <label>Hosted By</label>
-            <input name="hostedBy" onChange={this.onInputChange} pvalue={this.state.event.hostedBy} laceholder="Enter the name of person hosting" />
+            <input name="hostedBy" onChange={this.onInputChange} pvalue={this.state.event.hostedBy} placeholder="Enter the name of person hosting" />
           </Form.Field>
           <Button positive type="submit">
             Submit
           </Button>
-          <Button type="button" onClick={handleCancel}>Cancel</Button>
+          <Button type="button" onClick={this.props.history.goBack}>Cancel</Button>
         </Form>
       </Segment>
     )
   }
 }
+
+export default connect(mapState, actions)(EventForm);
