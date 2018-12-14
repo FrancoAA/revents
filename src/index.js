@@ -11,9 +11,12 @@ import * as serviceWorker from './serviceWorker';
 
 import ScrollToTop from './app/common/util/ScrollToTop';
 import { configureStore } from './app/store/configureStore';
+import { loadEvents } from './features/event/eventActions';
 
 
 const store = configureStore();
+store.dispatch(loadEvents());
+
 
 ReactDOM.render(
   <Provider store={store}>
