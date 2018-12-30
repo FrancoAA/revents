@@ -1,13 +1,31 @@
-import React from 'react';
-import { Form, Segment, Button } from 'semantic-ui-react';
-import { Field, reduxForm } from 'redux-form';
-import TextInput from '../../../app/common/form/TextInput';
+import React from "react";
+import { connect } from "react-redux";
+import { Form, Segment, Button, Label } from "semantic-ui-react";
+import { Field, reduxForm } from "redux-form";
+import { combineValidators, isRequired } from "revalidate";
+import TextInput from "../../../app/common/form/TextInput";
+import { registerUser } from "../authActions.jsx";
 
+const actions = {
+  registerUser
+};
 
-const RegisterForm = () => {
+const validate = combineValidators({
+  displayName: isRequired("displayName"),
+  email: isRequired("email"),
+  password: isRequired("password")
+});
+
+const RegisterForm = ({
+  handleSubmit,
+  registerUser,
+  error,
+  invalid,
+  submitting
+}) => {
   return (
     <div>
-      <Form size="large">
+      <Form size="large" onSubmit={handleSubmit(registerUser)}>
         <Segment>
           <Field
             name="displayName"
@@ -27,7 +45,17 @@ const RegisterForm = () => {
             component={TextInput}
             placeholder="Password"
           />
-          <Button fluid size="large" color="teal">
+          {error && (
+            <Label basic color="red">
+              {error}
+            </Label>
+          )}
+          <Button
+            disabled={invalid || submitting}
+            fluid
+            size="large"
+            color="teal"
+          >
             Register
           </Button>
         </Segment>
@@ -36,4 +64,7 @@ const RegisterForm = () => {
   );
 };
 
-export default reduxForm({form: 'RegisterForm'})(RegisterForm);
+export default connect(
+  null,
+  actions
+)(reduxForm({ form: "RegisterForm", validate })(RegisterForm));
