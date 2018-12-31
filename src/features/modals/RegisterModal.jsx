@@ -7,23 +7,10 @@ import RegisterForm from "../auth/Register/RegisterForm";
 
 const actions = { closeModal };
 
-const inlineStyle = {
-  modal: {
-    marginTop: "0px !important",
-    marginLeft: "auto",
-    marginRight: "auto"
-  }
-};
-
 class RegisterModal extends Component {
   render() {
     return (
-      <Modal
-        size="mini"
-        open={true}
-        style={inlineStyle.modal}
-        onClose={this.props.closeModal}
-      >
+      <Modal size="mini" open={true} onClose={this.props.closeModal}>
         <Modal.Header>Sign Up to Re-vents!</Modal.Header>
         <Modal.Content>
           <Modal.Description>

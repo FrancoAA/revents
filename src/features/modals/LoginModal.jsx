@@ -7,23 +7,10 @@ import { closeModal } from "./modalActions";
 
 const actions = { closeModal };
 
-const inlineStyle = {
-  modal: {
-    marginTop: "0px !important",
-    marginLeft: "auto",
-    marginRight: "auto"
-  }
-};
-
 class LoginModal extends Component {
   render() {
     return (
-      <Modal
-        size="mini"
-        open={true}
-        style={inlineStyle.modal}
-        onClose={this.props.closeModal}
-      >
+      <Modal size="mini" open={true} onClose={this.props.closeModal}>
         <Modal.Header>Login to Re-vents</Modal.Header>
         <Modal.Content>
           <Modal.Description>
