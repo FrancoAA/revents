@@ -1,17 +1,15 @@
-import React from "react";
-import { connect } from "react-redux";
-import { Grid } from "semantic-ui-react";
-import { Route, Switch, Redirect } from "react-router-dom";
+import React from 'react';
+import { connect } from 'react-redux';
+import { Grid } from 'semantic-ui-react';
+import { Route, Switch, Redirect } from 'react-router-dom';
 
-import SettingsNav from "./SettingsNav";
-import BasicPage from "./BasicPage";
-import AboutPage from "./AboutPage";
-import PhotosPage from "./PhotosPage";
-import AccountPage from "./AccountPage";
-import { updatePassword } from "../../auth/authActions";
-import { updateProfile } from "../../user/userActions";
-
-import { getFirebase } from "react-redux-firebase";
+import SettingsNav from './SettingsNav';
+import BasicPage from './BasicPage';
+import AboutPage from './AboutPage';
+import PhotosPage from './PhotosPage';
+import AccountPage from './AccountPage';
+import { updatePassword } from '../../auth/authActions';
+import { updateProfile } from '../../user/userActions';
 
 const actions = {
   updatePassword,
