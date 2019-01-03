@@ -15,7 +15,7 @@ import {
 } from 'semantic-ui-react';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
-import { uploadProfileImage, deletePhoto } from '../userActions';
+import { uploadProfileImage, deletePhoto, setMainPhoto } from '../userActions';
 import { toastr } from 'react-redux-toastr';
 import LoadingComponent from '../../../app/layouts/LoadingComponent';
 
@@ -32,7 +32,8 @@ const query = ({ auth }) => {
 
 const actions = {
   uploadProfileImage,
-  deletePhoto
+  deletePhoto,
+  setMainPhoto
 };
 
 const mapState = state => ({
@@ -91,9 +92,17 @@ class PhotosPage extends Component {
     });
   };
 
-  handlePhotoDelete = photo => () => {
+  handlePhotoDelete = photo => async () => {
     try {
       this.props.deletePhoto(photo);
+    } catch (error) {
+      toastr.error('Oops', error.message);
+    }
+  };
+
+  handleSetMainPhoto = photo => async () => {
+    try {
+      this.props.setMainPhoto(photo);
     } catch (error) {
       toastr.error('Oops', error.message);
     }
@@ -105,7 +114,6 @@ class PhotosPage extends Component {
       ? photos.filter(p => p.url !== profile.photoURL)
       : photos;
 
-    if (loading) return <LoadingComponent />;
     return (
       <Segment>
         <Header dividing size="large" content="Your Photos" />
@@ -150,12 +158,14 @@ class PhotosPage extends Component {
                 />
                 <Button.Group>
                   <Button
+                    loading={loading}
                     onClick={this.uploadImage}
                     style={{ width: '100px' }}
                     positive
                     icon="check"
                   />
                   <Button
+                    disabled={loading}
                     onClick={this.cancelCrop}
                     style={{ width: '100px' }}
                     icon="close"
@@ -171,7 +181,7 @@ class PhotosPage extends Component {
 
         <Card.Group itemsPerRow={5}>
           <Card>
-            <Image src={profile.photoURL} />
+            <Image src={profile.photoURL || '/assets/user.png'} />
             <Button positive>Main Photo</Button>
           </Card>
           {photos &&
@@ -179,7 +189,11 @@ class PhotosPage extends Component {
               <Card key={photo.id}>
                 <Image src={photo.url} />
                 <div className="ui two buttons">
-                  <Button basic color="green">
+                  <Button
+                    onClick={this.handleSetMainPhoto(photo)}
+                    basic
+                    color="green"
+                  >
                     Main
                   </Button>
                   <Button

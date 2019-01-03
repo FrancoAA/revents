@@ -64,6 +64,7 @@ export const uploadProfileImage = (file, fileName) => async (
   };
 
   try {
+    dispatch(asyncActionStart());
     let uploadedFile = await firebase.uploadFile(path, file, null, options);
     let downloadURL = await uploadedFile.uploadTaskSnapshot.downloadURL;
     let userDoc = await firestore.get(`users/${user.uid}`);
@@ -76,7 +77,7 @@ export const uploadProfileImage = (file, fileName) => async (
       });
     }
 
-    return await firestore.add(
+    await firestore.add(
       {
         collection: 'users',
         doc: user.uid,
@@ -87,8 +88,11 @@ export const uploadProfileImage = (file, fileName) => async (
         url: downloadURL
       }
     );
+
+    dispatch(asyncActionFinish());
   } catch (error) {
     console.log(error);
+    dispatch(asyncActionError());
     throw new Error('Problem uploading photo');
   }
 };
@@ -115,5 +119,22 @@ export const deletePhoto = photo => async (
     console.log(error);
     dispatch(asyncActionError());
     throw new Error('Problem deleting the photo');
+  }
+};
+
+export const setMainPhoto = photo => async (
+  dispatch,
+  getState,
+  { getFirebase }
+) => {
+  const firebase = getFirebase();
+
+  try {
+    return await firebase.updateProfile({
+      photoURL: photo.url
+    });
+  } catch (error) {
+    console.log(error);
+    throw new Error('Problem setting main photo');
   }
 };
