@@ -1,4 +1,9 @@
-import React, { Component } from "react";
+import differenceInYears from 'date-fns/difference_in_years';
+import format from 'date-fns/format';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { firestoreConnect } from 'react-redux-firebase';
 import {
   Button,
   Card,
@@ -10,12 +15,35 @@ import {
   List,
   Menu,
   Segment
-} from "semantic-ui-react";
+} from 'semantic-ui-react';
+
+const mapState = state => ({
+  user: state.firebase.auth,
+  profile: state.firebase.profile,
+  photos: state.firestore.ordered.photos
+});
+
+const userPhotosQuery = ({ user }) => {
+  return [
+    {
+      collection: 'users',
+      doc: user.uid,
+      subcollections: [{ collection: 'photos' }],
+      storeAs: 'photos'
+    }
+  ];
+};
 
 class UserDetailedPage extends Component {
   render() {
+    const { user, profile, photos } = this.props;
+    const age = profile.dateOfBirth
+      ? differenceInYears(Date.now(), profile.dateOfBirth.toDate())
+      : 'unknown age';
+
     return (
       <Grid>
+        {/* Header component */}
         <Grid.Column width={16}>
           <Segment>
             <Item.Group>
@@ -23,50 +51,55 @@ class UserDetailedPage extends Component {
                 <Item.Image
                   avatar
                   size="small"
-                  src="https://randomuser.me/api/portraits/men/20.jpg"
+                  src={profile.photoURL || '/assets/user.png'}
                 />
                 <Item.Content verticalAlign="bottom">
-                  <Header as="h1">First Name</Header>
+                  <Header as="h1">{user.displayName}</Header>
                   <br />
-                  <Header as="h3">Occupation</Header>
+                  <Header as="h3">{profile.occupation}</Header>
                   <br />
-                  <Header as="h3">27, Lives in London, UK</Header>
+                  <Header as="h3">
+                    {age}
+                    {', '}
+                    {profile.city}
+                  </Header>
                 </Item.Content>
               </Item>
             </Item.Group>
           </Segment>
         </Grid.Column>
+
+        {/* About component */}
         <Grid.Column width={12}>
           <Segment>
             <Grid columns={2}>
               <Grid.Column width={10}>
-                <Header icon="smile" content="About Display Name" />
+                <Header icon="smile" content={`About ${profile.displayName}`} />
                 <p>
-                  I am a: <strong>Occupation Placeholder</strong>
+                  I am a: <strong>{profile.occupation}</strong>
                 </p>
                 <p>
-                  Originally from <strong>United Kingdom</strong>
+                  Originally from <strong>{profile.origin}</strong>
                 </p>
                 <p>
-                  Member Since: <strong>28th March 2018</strong>
+                  Member Since:{' '}
+                  <strong>
+                    {profile.createdAt &&
+                      format(profile.createdAt.toDate(), 'dddd Do MMMM')}
+                  </strong>
                 </p>
-                <p>Description of user</p>
+                <p>{profile.about}</p>
               </Grid.Column>
               <Grid.Column width={6}>
                 <Header icon="heart outline" content="Interests" />
                 <List>
-                  <Item>
-                    <Icon name="heart" />
-                    <Item.Content>Interest 1</Item.Content>
-                  </Item>
-                  <Item>
-                    <Icon name="heart" />
-                    <Item.Content>Interest 2</Item.Content>
-                  </Item>
-                  <Item>
-                    <Icon name="heart" />
-                    <Item.Content>Interest 3</Item.Content>
-                  </Item>
+                  {profile.interests &&
+                    profile.interests.map((interest, key) => (
+                      <Item key={key}>
+                        <Icon name="heart" />
+                        <Item.Content>{interest}</Item.Content>
+                      </Item>
+                    ))}
                 </List>
               </Grid.Column>
             </Grid>
@@ -78,19 +111,21 @@ class UserDetailedPage extends Component {
           </Segment>
         </Grid.Column>
 
+        {/* Photos component */}
         <Grid.Column width={12}>
           <Segment attached>
             <Header icon="image" content="Photos" />
 
             <Image.Group size="small">
-              <Image src="https://randomuser.me/api/portraits/men/20.jpg" />
-              <Image src="https://randomuser.me/api/portraits/men/20.jpg" />
-              <Image src="https://randomuser.me/api/portraits/men/20.jpg" />
-              <Image src="https://randomuser.me/api/portraits/men/20.jpg" />
+              {photos &&
+                photos.map((photo, key) => (
+                  <Image key={key} src={photo.url || '/assets/user.png'} />
+                ))}
             </Image.Group>
           </Segment>
         </Grid.Column>
 
+        {/* Events component */}
         <Grid.Column width={12}>
           <Segment attached>
             <Header icon="calendar" content="Events" />
@@ -103,7 +138,7 @@ class UserDetailedPage extends Component {
 
             <Card.Group itemsPerRow={5}>
               <Card>
-                <Image src={"/assets/categoryImages/drinks.jpg"} />
+                <Image src={'/assets/categoryImages/drinks.jpg'} />
                 <Card.Content>
                   <Card.Header textAlign="center">Event Title</Card.Header>
                   <Card.Meta textAlign="center">
@@ -113,7 +148,7 @@ class UserDetailedPage extends Component {
               </Card>
 
               <Card>
-                <Image src={"/assets/categoryImages/drinks.jpg"} />
+                <Image src={'/assets/categoryImages/drinks.jpg'} />
                 <Card.Content>
                   <Card.Header textAlign="center">Event Title</Card.Header>
                   <Card.Meta textAlign="center">
@@ -129,4 +164,10 @@ class UserDetailedPage extends Component {
   }
 }
 
-export default UserDetailedPage;
+export default compose(
+  connect(
+    mapState,
+    null
+  ),
+  firestoreConnect(user => userPhotosQuery(user))
+)(UserDetailedPage);
