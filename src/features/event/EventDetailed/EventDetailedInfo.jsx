@@ -1,29 +1,30 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import format from 'date-fns/format';
 import { Segment, Grid, Icon, Button } from 'semantic-ui-react';
 
 import EventDetailedMap from './EventDetailedMap';
 
 class EventDetailedInfo extends Component {
-
   state = {
-    showMap : false
-  }
+    showMap: false
+  };
 
   componentWillUnmount() {
     this.setState({
-      showMap : false
+      showMap: false
     });
   }
 
   showMapToggle = () => {
     this.setState(prevState => ({
-      showMap : !prevState.showMap
+      showMap: !prevState.showMap
     }));
-  }
+  };
 
   render() {
-    const {event} = this.props;
+    const { event } = this.props;
+    let eventDate = event.date && event.date.toDate();
+
     return (
       <Segment.Group>
         <Segment attached="top">
@@ -42,7 +43,10 @@ class EventDetailedInfo extends Component {
               <Icon name="calendar" size="large" color="teal" />
             </Grid.Column>
             <Grid.Column width={15}>
-              <span>{format(event.date, 'dddd Do MMMM')} at{' '} {format(event.date, 'h:mm A')}</span>
+              <span>
+                {format(eventDate, 'dddd Do MMMM')} at{' '}
+                {format(eventDate, 'h:mm A')}
+              </span>
             </Grid.Column>
           </Grid>
         </Segment>
@@ -55,20 +59,24 @@ class EventDetailedInfo extends Component {
               <span>{event.venue}</span>
             </Grid.Column>
             <Grid.Column width={4}>
-              <Button onClick={this.showMapToggle} color="teal" size="tiny" content="Show Map" />
+              <Button
+                onClick={this.showMapToggle}
+                color="teal"
+                size="tiny"
+                content="Show Map"
+              />
             </Grid.Column>
           </Grid>
         </Segment>
-        {this.state.showMap &&
+        {this.state.showMap && (
           <EventDetailedMap
             lat={event.venueLatLng.lat}
             lng={event.venueLatLng.lng}
           />
-        }
+        )}
       </Segment.Group>
     );
   }
 }
 
 export default EventDetailedInfo;
-

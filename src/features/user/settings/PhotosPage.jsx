@@ -17,7 +17,6 @@ import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { uploadProfileImage, deletePhoto, setMainPhoto } from '../userActions';
 import { toastr } from 'react-redux-toastr';
-import LoadingComponent from '../../../app/layouts/LoadingComponent';
 
 const query = ({ auth }) => {
   return [

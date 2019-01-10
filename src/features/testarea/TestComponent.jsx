@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button, Icon } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import { incrementAsync, decrementAsync } from './testActions';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
+import PlacesAutocomplete, {
+  geocodeByAddress,
+  getLatLng
+} from 'react-places-autocomplete';
 import Script from 'react-load-script';
 import { GOOGLE_MAPS_KEY } from '../../app/common/API_KEYS';
 import { openModal } from '../modals/modalActions';
 
-
-const mapState = (state) => ({
+const mapState = state => ({
   data: state.test.data,
-  loading : state.test.loading
+  loading: state.test.loading
 });
 
 const actions = {
@@ -18,7 +20,6 @@ const actions = {
   decrementAsync,
   openModal
 };
-
 
 class TestComponent extends Component {
   static defaultProps = {
@@ -30,34 +31,40 @@ class TestComponent extends Component {
   };
 
   state = {
-    address : '',
-    scriptLoaded : false
-  }
+    address: '',
+    scriptLoaded: false
+  };
 
-  handleFormSubmit = (event) => {
-    event.preventDefault()
+  handleFormSubmit = event => {
+    event.preventDefault();
 
     geocodeByAddress(this.state.address)
       .then(results => getLatLng(results[0]))
       .then(latLng => console.log('Success', latLng))
-      .catch(error => console.error('Error', error))
-  }
+      .catch(error => console.error('Error', error));
+  };
 
-  onChange = (address) => this.setState({ address })
+  onChange = address => this.setState({ address });
 
   handleScriptLoad = () => {
     this.setState({
-      scriptLoaded : true
+      scriptLoaded: true
     });
-  }
+  };
 
   render() {
-    const { incrementAsync, decrementAsync, data, openModal, loading } = this.props;
+    const {
+      incrementAsync,
+      decrementAsync,
+      data,
+      openModal,
+      loading
+    } = this.props;
 
     const inputProps = {
       value: this.state.address,
-      onChange: this.onChange,
-    }
+      onChange: this.onChange
+    };
 
     return (
       <div>
@@ -67,19 +74,37 @@ class TestComponent extends Component {
         />
         <h1>Test Area</h1>
         <h3>The answer is: {data}</h3>
-        <Button loading={loading} content="Increment" onClick={incrementAsync} color="green"/>
-        <Button loading={loading}  content="Decrement" onClick={decrementAsync} color="red"/>
-        <Button content="Open Modal" onClick={() => openModal('TestModal', {data: 43})} color="teal"/>
-        <br/>
-        <br/>
+        <Button
+          loading={loading}
+          content="Increment"
+          onClick={incrementAsync}
+          color="green"
+        />
+        <Button
+          loading={loading}
+          content="Decrement"
+          onClick={decrementAsync}
+          color="red"
+        />
+        <Button
+          content="Open Modal"
+          onClick={() => openModal('TestModal', { data: 43 })}
+          color="teal"
+        />
+        <br />
+        <br />
         <form onSubmit={this.handleFormSubmit}>
-          {this.state.scriptLoaded && <PlacesAutocomplete inputProps={inputProps} />}
+          {this.state.scriptLoaded && (
+            <PlacesAutocomplete inputProps={inputProps} />
+          )}
           <button type="submit">Test</button>
         </form>
       </div>
-
-    )
+    );
   }
 }
 
-export default connect(mapState, actions)(TestComponent);
+export default connect(
+  mapState,
+  actions
+)(TestComponent);
