@@ -1,14 +1,13 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { Grid } from "semantic-ui-react";
-import { toastr } from "react-redux-toastr";
-import { withFirestore } from "react-redux-firebase";
-import { objectToArray } from "../../../app/common/util/helpers";
-import EventDetailedChats from "./EventDetailedChats";
-import EventDetailedHeader from "./EventDetailedHeader";
-import EventDetailedInfo from "./EventDetailedInfo";
-import EventDetailedSidebar from "./EventDetailedSidebar";
-import { auth } from "firebase";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Grid } from 'semantic-ui-react';
+import { withFirestore } from 'react-redux-firebase';
+import { objectToArray } from '../../../app/common/util/helpers';
+import EventDetailedChats from './EventDetailedChats';
+import EventDetailedHeader from './EventDetailedHeader';
+import EventDetailedInfo from './EventDetailedInfo';
+import EventDetailedSidebar from './EventDetailedSidebar';
+import { goingToEvent, cancelGoingToEvent } from '../../user/userActions';
 
 const mapState = state => {
   let event = {};
@@ -23,25 +22,24 @@ const mapState = state => {
   };
 };
 
+const actions = {
+  goingToEvent,
+  cancelGoingToEvent
+};
+
 class EventDetailedPage extends Component {
   async componentDidMount() {
-    const { firestore, match, history } = this.props;
+    const { firestore, match } = this.props;
+    await firestore.setListener(`events/${match.params.id}`);
+  }
 
-    let event = await firestore.get(`events/${match.params.id}`);
-
-    if (!event.exists) {
-      history.push("/events");
-      toastr.error("Sorry", "Event not found");
-      return;
-    }
-
-    this.setState({
-      event
-    });
+  async componentWillUnmount() {
+    const { firestore, match } = this.props;
+    await firestore.unsetListener(`events/${match.params.id}`);
   }
 
   render() {
-    const { event, auth } = this.props;
+    const { event, auth, goingToEvent, cancelGoingToEvent } = this.props;
     const attendees = event && objectToArray(event.attendees);
     const isHost = event.hostUid === auth.uid;
     const isGoing = attendees && attendees.find(a => a.id === auth.uid);
@@ -53,6 +51,8 @@ class EventDetailedPage extends Component {
             event={event}
             isHost={isHost}
             isGoing={isGoing}
+            goingToEvent={goingToEvent}
+            cancelGoingToEvent={cancelGoingToEvent}
           />
           <EventDetailedInfo event={event} />
           <EventDetailedChats event={event} />
@@ -66,4 +66,9 @@ class EventDetailedPage extends Component {
   }
 }
 
-export default withFirestore(connect(mapState)(EventDetailedPage));
+export default withFirestore(
+  connect(
+    mapState,
+    actions
+  )(EventDetailedPage)
+);

@@ -1,19 +1,19 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Segment, Item, Image, Button, Header } from "semantic-ui-react";
-import format from "date-fns/format";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Segment, Item, Image, Button, Header } from 'semantic-ui-react';
+import format from 'date-fns/format';
 
 const eventImageStyle = {
-  filter: "brightness(30%)"
+  filter: 'brightness(30%)'
 };
 
 const eventImageTextStyle = {
-  position: "absolute",
-  bottom: "5%",
-  left: "5%",
-  width: "100%",
-  height: "auto",
-  color: "white"
+  position: 'absolute',
+  bottom: '5%',
+  left: '5%',
+  width: '100%',
+  height: 'auto',
+  color: 'white'
 };
 
 const EventDetailedHeader = ({
@@ -27,7 +27,7 @@ const EventDetailedHeader = ({
 
   return (
     <Segment.Group>
-      <Segment basic attached="top" style={{ padding: "0" }}>
+      <Segment basic attached="top" style={{ padding: '0' }}>
         <Image
           src={`/assets/categoryImages/${event.category}.jpg`}
           fluid
@@ -41,9 +41,9 @@ const EventDetailedHeader = ({
                 <Header
                   size="huge"
                   content={event.title}
-                  style={{ color: "white" }}
+                  style={{ color: 'white' }}
                 />
-                <p>{format(eventDate, "dddd Do MMMM")}</p>
+                <p>{format(eventDate, 'dddd Do MMMM')}</p>
                 <p>
                   Hosted by <strong>{event.hostedBy}</strong>
                 </p>
@@ -57,9 +57,13 @@ const EventDetailedHeader = ({
         {!isHost && (
           <div>
             {isGoing ? (
-              <Button>Cancel My Place</Button>
+              <Button onClick={() => cancelGoingToEvent(event)}>
+                Cancel My Place
+              </Button>
             ) : (
-              <Button color="teal">JOIN THIS EVENT</Button>
+              <Button color="teal" onClick={() => goingToEvent(event)}>
+                JOIN THIS EVENT
+              </Button>
             )}
           </div>
         )}
