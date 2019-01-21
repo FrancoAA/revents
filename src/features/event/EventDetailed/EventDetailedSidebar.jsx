@@ -1,6 +1,6 @@
-import React from "react";
-
-import { Segment, List, Item, Label } from "semantic-ui-react";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Segment, List, Item, Label } from 'semantic-ui-react';
 
 const EventDetailedSidebar = ({ attendees }) => {
   const isHost = false;
@@ -9,23 +9,23 @@ const EventDetailedSidebar = ({ attendees }) => {
     <div>
       <Segment
         textAlign="center"
-        style={{ border: "none" }}
+        style={{ border: 'none' }}
         attached="top"
         secondary
         inverted
         color="teal"
       >
-        {attendees && attendees.length}{" "}
-        {attendees && attendees.length === 1 ? "Person" : "People"} Going
+        {attendees && attendees.length}{' '}
+        {attendees && attendees.length === 1 ? 'Person' : 'People'} Going
       </Segment>
       <Segment attached>
         <List relaxed divided>
           {attendees &&
             attendees.map(attendee => (
-              <Item key={attendee.id} style={{ position: "relative" }}>
+              <Item key={attendee.id} style={{ position: 'relative' }}>
                 {isHost && (
                   <Label
-                    style={{ position: "absolute" }}
+                    style={{ position: 'absolute' }}
                     color="orange"
                     ribbon="right"
                   >
@@ -35,7 +35,9 @@ const EventDetailedSidebar = ({ attendees }) => {
                 <Item.Image src={attendee.photoURL} />
                 <Item.Content verticalAlign="middle">
                   <Item.Header as="h3">
-                    <a>{attendee.displayName}</a>
+                    <Link to={`/profile/${attendee.id}`}>
+                      {attendee.displayName}
+                    </Link>
                   </Item.Header>
                 </Item.Content>
               </Item>

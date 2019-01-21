@@ -3,7 +3,7 @@ import format from 'date-fns/format';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { firestoreConnect } from 'react-redux-firebase';
+import { firestoreConnect, isEmpty } from 'react-redux-firebase';
 import {
   Button,
   Card,
@@ -16,22 +16,27 @@ import {
   Menu,
   Segment
 } from 'semantic-ui-react';
+import { userDetailedQuery } from '../userQueries';
 
-const mapState = state => ({
-  user: state.firebase.auth,
-  profile: state.firebase.profile,
-  photos: state.firestore.ordered.photos
-});
+const mapState = (state, ownProps) => {
+  let userUid = null;
+  let profile = {};
 
-const userPhotosQuery = ({ user }) => {
-  return [
-    {
-      collection: 'users',
-      doc: user.uid,
-      subcollections: [{ collection: 'photos' }],
-      storeAs: 'photos'
-    }
-  ];
+  if (ownProps.match.params.id === state.auth.uid) {
+    profile = state.firebase.profile;
+  } else {
+    profile =
+      isEmpty(state.firebase.ordered.profile[0]) &&
+      state.firebase.ordered.profile[0];
+    userUid = ownProps.match.params.id;
+  }
+
+  return {
+    profile,
+    userUid,
+    user: state.firebase.auth,
+    photos: state.firestore.ordered.photos
+  };
 };
 
 class UserDetailedPage extends Component {
@@ -169,5 +174,5 @@ export default compose(
     mapState,
     null
   ),
-  firestoreConnect(user => userPhotosQuery(user))
+  firestoreConnect((user, userUid) => userDetailedQuery(user, userUid))
 )(UserDetailedPage);
