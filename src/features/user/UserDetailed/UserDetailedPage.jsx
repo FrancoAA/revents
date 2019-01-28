@@ -3,6 +3,7 @@ import format from 'date-fns/format';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { Link } from 'react-router-dom';
 import { firestoreConnect, isEmpty } from 'react-redux-firebase';
 import {
   Button,
@@ -22,12 +23,12 @@ const mapState = (state, ownProps) => {
   let userUid = null;
   let profile = {};
 
-  if (ownProps.match.params.id === state.auth.uid) {
+  if (ownProps.match.params.id === state.firebase.auth.uid) {
     profile = state.firebase.profile;
   } else {
     profile =
-      isEmpty(state.firebase.ordered.profile[0]) &&
-      state.firebase.ordered.profile[0];
+      !isEmpty(state.firestore.ordered.profile) &&
+      state.firestore.ordered.profile[0];
     userUid = ownProps.match.params.id;
   }
 
@@ -41,10 +42,11 @@ const mapState = (state, ownProps) => {
 
 class UserDetailedPage extends Component {
   render() {
-    const { user, profile, photos } = this.props;
+    const { user, profile, photos, match } = this.props;
     const age = profile.dateOfBirth
       ? differenceInYears(Date.now(), profile.dateOfBirth.toDate())
       : 'unknown age';
+    const isCurrentUser = user.uid === match.params.id;
 
     return (
       <Grid>
@@ -59,7 +61,7 @@ class UserDetailedPage extends Component {
                   src={profile.photoURL || '/assets/user.png'}
                 />
                 <Item.Content verticalAlign="bottom">
-                  <Header as="h1">{user.displayName}</Header>
+                  <Header as="h1">{profile.displayName}</Header>
                   <br />
                   <Header as="h3">{profile.occupation}</Header>
                   <br />
@@ -112,7 +114,18 @@ class UserDetailedPage extends Component {
         </Grid.Column>
         <Grid.Column width={4}>
           <Segment>
-            <Button color="teal" fluid basic content="Edit Profile" />
+            {isCurrentUser ? (
+              <Button
+                color="teal"
+                fluid
+                basic
+                content="Edit Profile"
+                as={Link}
+                to="/settings"
+              />
+            ) : (
+              <Button color="teal" fluid basic content="Follow User" />
+            )}
           </Segment>
         </Grid.Column>
 

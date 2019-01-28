@@ -1,5 +1,5 @@
-export const userDetailedQuery = ({ auth, userUid }) => {
-  if (userUid !== null) {
+export const userDetailedQuery = ({ user, userUid }) => {
+  if (userUid) {
     return [
       {
         collection: 'users',
@@ -17,7 +17,7 @@ export const userDetailedQuery = ({ auth, userUid }) => {
     return [
       {
         collection: 'users',
-        doc: auth.uid,
+        doc: user.uid,
         subcollections: [{ collection: 'photos' }],
         storeAs: 'photos'
       }
