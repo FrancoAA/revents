@@ -13,36 +13,17 @@ export const updateProfile = user => async (
   { getFirebase }
 ) => {
   const firebase = getFirebase();
+  const { isLoaded, isEmpty, ...updatedUser } = user;
 
-  if (user.dateOfBirth !== getState().firebase.profile.dateOfBirth) {
-    user.dateOfBirth = moment(user.dateOfBirth).toDate();
+  if (updatedUser.dateOfBirth) {
+    updatedUser.dateOfBirth = moment(updatedUser.dateOfBirth).toDate();
   }
 
   try {
     dispatch(asyncActionStart());
-    let getProfile = ({
-      displayName,
-      dateOfBirth,
-      city,
-      status,
-      about,
-      interests,
-      occupation,
-      origin
-    }) => ({
-      displayName,
-      dateOfBirth,
-      city,
-      status,
-      about,
-      interests,
-      occupation,
-      origin
-    });
-    const profile = getProfile(user);
-    await firebase.updateProfile(profile);
+    await firebase.updateProfile(updatedUser);
+    toastr.success('Success!', 'Profile updated');
     dispatch(asyncActionFinish());
-    toastr.success('Success', 'Profile updated');
   } catch (error) {
     console.log(error);
     dispatch(asyncActionError());
@@ -146,7 +127,7 @@ export const goingToEvent = event => async (
 ) => {
   const firestore = getFirestore();
   const user = firestore.auth().currentUser;
-  const photoURL = getState().firebase.profile.photoURL;
+  const photoURL = getState().firebase.profile.photoURL || '/assets/user.png';
 
   const attendee = {
     going: true,

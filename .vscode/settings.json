@@ -3,5 +3,8 @@
     "activityBar.background": "#431F4B",
     "titleBar.activeBackground": "#5D2B6A",
     "titleBar.activeForeground": "#FDFCFE"
-  }
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "prettier.jsxBracketSameLine": true
 }
