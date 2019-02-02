@@ -17,7 +17,9 @@ import {
   Menu,
   Segment
 } from 'semantic-ui-react';
+import LazyLoad from 'react-lazyload';
 import { userDetailedQuery } from '../userQueries';
+import LoadingComponent from '../../../app/layouts/LoadingComponent';
 
 const mapState = (state, ownProps) => {
   let userUid = null;
@@ -36,17 +38,21 @@ const mapState = (state, ownProps) => {
     profile,
     userUid,
     user: state.firebase.auth,
-    photos: state.firestore.ordered.photos
+    photos: state.firestore.ordered.photos,
+    requesting: state.firestore.status.requesting
   };
 };
 
 class UserDetailedPage extends Component {
   render() {
-    const { user, profile, photos, match } = this.props;
+    const { user, profile, photos, match, requesting } = this.props;
     const age = profile.dateOfBirth
       ? differenceInYears(Date.now(), profile.dateOfBirth.toDate())
       : 'unknown age';
     const isCurrentUser = user.uid === match.params.id;
+    const loading = Object.values(requesting).some(obj => obj === true);
+
+    if (loading) return <LoadingComponent inverted={true} />;
 
     return (
       <Grid>
@@ -137,7 +143,13 @@ class UserDetailedPage extends Component {
             <Image.Group size="small">
               {photos &&
                 photos.map((photo, key) => (
-                  <Image key={key} src={photo.url || '/assets/user.png'} />
+                  <LazyLoad
+                    key={photo.id}
+                    height={150}
+                    placeholder={<Image src="/assets/user.png" />}
+                  >
+                    <Image src={photo.url} />
+                  </LazyLoad>
                 ))}
             </Image.Group>
           </Segment>
